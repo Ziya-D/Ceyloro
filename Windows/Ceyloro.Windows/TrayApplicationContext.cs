@@ -13,7 +13,7 @@ public sealed class TrayApplicationContext : ApplicationContext
     private RadialOverlayForm? overlay;
     private SettingsForm? settingsForm;
 
-    public TrayApplicationContext()
+    public TrayApplicationContext(bool openOverlayOnStartup = false)
     {
         engine = new ConversionEngine(settings);
         brandedIcon = CreateTrayIcon();
@@ -33,6 +33,14 @@ public sealed class TrayApplicationContext : ApplicationContext
             AppLog.Write(settings.LoadWarning);
             trayIcon.ShowBalloonTip(6000, "Ceyloro", settings.LoadWarning, ToolTipIcon.Warning);
         }
+        if (openOverlayOnStartup)
+            Application.Idle += OpenOverlayOnFirstIdle;
+    }
+
+    private void OpenOverlayOnFirstIdle(object? sender, EventArgs e)
+    {
+        Application.Idle -= OpenOverlayOnFirstIdle;
+        OpenOverlay();
     }
 
     private ContextMenuStrip BuildMenu()
